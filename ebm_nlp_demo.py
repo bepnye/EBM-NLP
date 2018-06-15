@@ -92,7 +92,7 @@ def read_anns(phase, element, ann_type = 'aggregated', model_phase = 'train'):
 def print_token_labels(doc, width = 80): 
   t_str = '' 
   l_str = '' 
-  for labels in doc.anns:
+  for wid, labels in doc.anns.items():
     for t, l in zip(doc.tokens, labels):
       if l != 0:
         l_s = doc.decoder[l]
@@ -100,16 +100,15 @@ def print_token_labels(doc, width = 80):
         l_s = ' '*len(t)
       slen = max(len(t), len(l_s))
       if len(t_str) + slen > width:
-        print t_str
         if any([c != ' ' for c in l_str]):
           print l_str
-          print
+        print t_str
         t_str = '' 
         l_str = '' 
       t_str += ' ' + rpad(t, slen)
       l_str += ' ' + rpad(l_s, slen)
-    print t_str
     print l_str
+    print t_str
 
 def condense_labels(labels):
   groups = [(k, sum(1 for _ in g)) for k,g in groupby(labels)]
