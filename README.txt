@@ -33,8 +33,9 @@ annotations/
       participants/
         0: No label
         1: Age
-        2: Sample size
-        3: Condition
+        2: Sex
+        3: Sample size
+        4: Condition
 
       interventions/
         0: No label
