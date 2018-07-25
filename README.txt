@@ -1,3 +1,10 @@
+IMPORTANT NOTE:
+
+The test set for the hierarchical labels is the expert labels on the same (aggregated, crowd-sourced) spans that were used as inputs to the second annotation phase. This makes it only a true gold standard for the task of assigning detailed labels to extracted spans.
+
+If you are developing a model that performs both the span extraction and label assigment jointly, you will need a test set that contains both gold standard spans as well as labels. We are currently collecting this, and expect to be finished very shortly. Thanks for your patience!
+
+
 This corpus release contains 4,993 documents annotated with (P)articipants, (I)nterventions, and (O)utcomes.
 The files included in this release are as follows
 
