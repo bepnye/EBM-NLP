@@ -33,7 +33,8 @@ annotations/
   2) hierarchical_labels/
       These are the second-phase annotations where workers received the previous PMID_AGGREGATED.ann annotations
       for each document and assigned more specific labels to whichever already labeled tokens deemed relevant.
-  After this, the files are separated by PICO element and then the train/test partitions. The test folder contains two versions:
+  After this, the files are separated by PICO element and then the train/test partitions. The test folder contains
+  two versions:
   1) test/gold/
       These annotations were collected from medical professionals and are the true target testing set
   2) test/crowd/
@@ -81,5 +82,6 @@ annotations/
           Resource use
           Withdrawl from study
 
-        The more specific labels were conflated so frequently that they were of little practical use individually. The full expansions of the "Mental" and "Other" labels are available upon request (nye.b@husky.neu.edu).
+        The more specific labels were conflated so frequently that they were of little practical use individually.
+        The full expansions of the "Mental" and "Other" labels are available upon request (nye.b@husky.neu.edu).
         
