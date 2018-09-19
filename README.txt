@@ -67,7 +67,7 @@ annotations/
         5: Mental
         6: Other
 
-        Here, two sections of the hierarchy have been collapsed due to frequent cross-labeling:
+        Here, two sections of the hierarchy have been collapsed: 
         
         Mental =
           Mental health
@@ -81,4 +81,5 @@ annotations/
           Resource use
           Withdrawl from study
 
-        The full labels are available upon request (nye.b@husky.neu.edu)
+        The more specific labels were conflated so frequently that they were of little practical use individually. The full expansions of the "Mental" and "Other" labels are available upon request (nye.b@husky.neu.edu).
+        

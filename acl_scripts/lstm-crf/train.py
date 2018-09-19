@@ -1,5 +1,6 @@
 from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
+from model.base_model import BaseModel
 from model.config import Config
 
 
@@ -20,7 +21,7 @@ def main():
                          config.processing_tag, config.max_iter)
 
     # train model
-    print 'training'
+    print('training')
     model.train(train, dev)
 
 if __name__ == "__main__":

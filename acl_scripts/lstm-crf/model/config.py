@@ -2,7 +2,6 @@ import os
 from .general_utils import get_logger
 from .data_utils import get_trimmed_glove_vectors, load_vocab, \
         get_processing_word
-path = '/nlp/data/romap/lstm-tuning/joint/'
 
 class Config():
     def __init__(self, load=True):
@@ -52,38 +51,39 @@ class Config():
         self.embeddings = (get_trimmed_glove_vectors(self.filename_trimmed)
                 if self.use_pretrained else None)
 
+    cwd = os.getcwd()
 
     # general config
-    dir_output = path + "results/test/"
-    dir_model  = dir_output + "model.weights/"
-    path_log   = dir_output + "log.txt"
+    dir_output = os.path.join(cwd, "results/test/")
+    dir_model  = os.path.join(dir_output, "model.weights/")
+    path_log   = os.path.join(dir_output, "log.txt")
 
     # embeddings
     dim_word = 200
     dim_char = 100
 
     # glove files
-    filename_glove = path + "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
+    # filename_glove = os.path.join(cwd, "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
     #change to PubMed
-    filename_glove = "/nlp/data/romap/w2v/PubMed-w2v.txt"
+    filename_glove = os.path.join(cwd, "data/embeddings/PubMed-w2v.txt")
 
     # trimmed embeddings (created from glove_filename with build_data.py)
-    filename_trimmed = path + "data/glove.6B.{}d.trimmed.npz".format(dim_word)
+    filename_trimmed = os.path.join(cwd, "data/embeddings.{}d.trimmed.npz".format(dim_word))
     use_pretrained = True
 
     # dataset
-    filename_dev = path + "data/dev.txt"
-    filename_test = path + "data/test.txt"
-    filename_train = path + "data/train.txt"
+    filename_dev = os.path.join(cwd, "data/dev.txt")
+    filename_test = os.path.join(cwd, "data/test.txt")
+    filename_train = os.path.join(cwd, "data/train.txt")
 
     #filename_dev = filename_test = filename_train = "data/test.txt" # test
 
     max_iter = None # if not None, max number of examples in Dataset
 
     # vocab (created from dataset with build_data.py)
-    filename_words = path + "data/words.txt"
-    filename_tags = path + "data/tags.txt"
-    filename_chars = path + "data/chars.txt"
+    filename_words = os.path.join(cwd, "data/words.txt")
+    filename_tags = os.path.join(cwd, "data/tags.txt")
+    filename_chars = os.path.join(cwd, "data/chars.txt")
 
     # training
     train_embeddings = False

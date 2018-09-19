@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 
 
-from .data_utils import minibatches, pad_sequences, get_chunks
+from .data_utils import minibatches, pad_sequences, get_chunks, NONE
 from .general_utils import Progbar
 from .base_model import BaseModel
 
@@ -310,6 +310,9 @@ class NERModel(BaseModel):
             metrics: (dict) metrics["acc"] = 98.4, ...
 
         """
+        tags = self.idx_to_tag.values()
+        stats = { tag: { 'n_correct': 0., 'n_pred': 0., 'n_true': 0. } for tag in tags }
+
         accs = []
         correct_preds, total_correct, total_preds = 0., 0., 0.
         for words, labels in minibatches(test, self.config.batch_size):
@@ -321,20 +324,39 @@ class NERModel(BaseModel):
                 lab_pred = lab_pred[:length]
                 accs    += [a==b for (a, b) in zip(lab, lab_pred)]
 
+                for l_true, l_pred in zip(lab, lab_pred):
+                  if l_true == l_pred:
+                    stats[self.idx_to_tag[l_true]]['n_correct'] += 1
+                  stats[self.idx_to_tag[l_true]]['n_true'] += 1
+                  stats[self.idx_to_tag[l_pred]]['n_pred'] += 1
+
+
                 lab_chunks      = set(get_chunks(lab, self.config.vocab_tags))
-                lab_pred_chunks = set(get_chunks(lab_pred,
-                                                 self.config.vocab_tags))
+                lab_pred_chunks = set(get_chunks(lab_pred, self.config.vocab_tags))
 
-                correct_preds += len(lab_chunks & lab_pred_chunks)
-                total_preds   += len(lab_pred_chunks)
-                total_correct += len(lab_chunks)
+                #correct_preds += len(lab_chunks & lab_pred_chunks)
+                #total_preds   += len(lab_pred_chunks)
+                #total_correct += len(lab_chunks)
 
+        # Span stats
         p   = correct_preds / total_preds if correct_preds > 0 else 0
         r   = correct_preds / total_correct if correct_preds > 0 else 0
         f1  = 2 * p * r / (p + r) if correct_preds > 0 else 0
         acc = np.mean(accs)
 
-        return {"acc": 100*acc, "f1": 100*f1, "prec": 100*p, "recl": 100*r}
+        # Token stats
+        results = { metric: {} for metric in ['f1', 'p', 'r'] }
+        for tag, counts in stats.items():
+          tag_p = counts['n_correct'] / counts['n_pred']
+          tag_r = counts['n_correct'] / counts['n_true']
+          results['p'][tag] = tag_p
+          results['r'][tag] = tag_r
+          results['f1'][tag] = 2 * tag_p * tag_r / (tag_p + tag_r)
+          print '%s: %s' %(tag, '  '.join(['%s=%.2f' %(metric, results[metric][tag]) for metric in results]))
+
+        macro_results = { metric: np.mean(results[metric].values()) for metric in results }
+
+        return macro_results
 
 
     def predict(self, words_raw):

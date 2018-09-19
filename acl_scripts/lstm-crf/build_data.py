@@ -2,12 +2,12 @@ from model.config import Config
 from model.data_utils import CoNLLDataset, get_vocabs, UNK, NUM, \
     get_glove_vocab, write_vocab, load_vocab, get_char_vocab, \
     export_trimmed_glove_vectors, get_processing_word
-import json, re
+import json, re, os, sys
 import nltk
 from nltk import pos_tag, sent_tokenize
 from nltk import ngrams
-
-path = '/nlp/data/romap/lstm-tuning/joint/'
+from glob import glob
+from collections import defaultdict
 
 def main():
     """Procedure to build data
@@ -28,19 +28,19 @@ def main():
     # get config and processing of words
     # loads PubMeda articles
     config = Config(load=False)
-    print 'Config'
+    print('Config')
     processing_word = get_processing_word(lowercase=True)
-    print 'Processing_word'
+    print('Processing_word')
 
     # Generators
     dev   = CoNLLDataset(config.filename_dev, processing_word)
     test  = CoNLLDataset(config.filename_test, processing_word)
     train = CoNLLDataset(config.filename_train, processing_word)
-    print 'Loaded dev, test, train'
+    print('Loaded dev, test, train')
 
     # Build Word and Tag vocab
     vocab_words, vocab_tags = get_vocabs([train, dev, test])
-    print 'Loading vocab_words'
+    print('Loading vocab_words')
     vocab_glove = get_glove_vocab(config.filename_glove)
 
     vocab = vocab_words & vocab_glove
@@ -97,108 +97,53 @@ def tokenize(s):
             res.append((s[l:r], l, r))
     return res
 
+def fname_to_pmid(fname):
+    pmid = os.path.splitext(os.path.basename(fname))[0].split('_')[0]
+    return pmid
+
+def pre_main():
+    id_to_labels = defaultdict(lambda: {})
+    id_to_tokens = {}
+    id_to_pos = {}
+    crowd_ids, gold_ids = set(), set()
+    PIO = ['participants', 'interventions', 'outcomes']
+    for pio in PIO:
+      print('Reading files for %s' %pio)
+      crowd_labels = glob('../../ebm_nlp_1_00/annotations/aggregated/starting_spans/%s/train/*.ann' %pio)
+      for fname in crowd_labels: crowd_ids.add(fname_to_pmid(fname))
+
+      test_labels = glob('../../ebm_nlp_1_00/annotations/aggregated/starting_spans/%s/test/gold/*.ann' %pio)
+      for fname in test_labels: gold_ids.add(fname_to_pmid(fname))
+
+      print('processing %d files' %len(crowd_labels + test_labels))
+      for fname in crowd_labels + test_labels:
+        pmid = fname_to_pmid(fname)
+        id_to_labels[pmid][pio] = open(fname).read().split(',')
+        if pmid not in id_to_tokens:
+          tokens, tags = zip(*nltk.pos_tag(open('../../ebm_nlp_1_00/documents/%s.tokens' %pmid).read().split()))
+          id_to_tokens[pmid] = tokens
+          id_to_pos[pmid] = tags
+
+    crowd_ids = list(filter(lambda pmid: len(id_to_labels[pmid]) == len(PIO), crowd_ids))
+    dev_idx = int(len(crowd_ids) * 0.2)
+    dev_ids, train_ids = crowd_ids[:dev_idx], crowd_ids[dev_idx:]
+
+    gold_ids = list(filter(lambda pmid: len(id_to_labels[pmid]) == len(PIO), gold_ids))
+    test_ids = gold_ids
+
+    for ids, fname in [(dev_ids, 'dev'), (train_ids, 'train'), (test_ids, 'test')]:
+      fout = open('data/%s.txt' %fname, 'w')
+      for pmid in ids:
+        fout.write('-DOCSTART- -X- O O\n\n')
+        for i, (token, pos) in enumerate(zip(id_to_tokens[pmid], id_to_pos[pmid])):
+          labels = [int(id_to_labels[pmid][pio][i]) for pio in PIO]
+          label = 'N'
+          for pio, is_applied in zip(PIO, labels):
+            if is_applied:
+              label = pio[0]
+          fout.write('%s %s %s\n' %(token, pos, label))
+          if token == '.': fout.write('\n')
+
 if __name__ == "__main__":
+    pre_main()
     main()
-
-    '''train, test, dev = [], [], []
-    path = '/Users/romapatel/Desktop/set/'
-    f = open(path + 'data/docids/gold.txt', 'r')
-    for line in f: test.append(line.strip())
-
-    f = open(path + 'data/docids/dev.txt', 'r')
-    for line in f: dev.append(line.strip())
-    
-    f = open(path + 'data/docids/train.txt', 'r')
-    for line in f: train.append(line.strip())
-
-    f = open(path + 'data/docids/test.txt', 'r')
-    for line in f: train.append(line.strip())'''
-
-    '''crowd, gold = {}, {}
-    f = open('/Users/romapatel/Desktop/PICO-data/annotations/PICO-annos-crowd-hmm-mv-union.json', 'r')
-    for line in f:
-        temp = json.loads(line); gold[temp['docid']] = temp
-    f = open('/Users/romapatel/Desktop/PICO-data/annotations/PICO-annos-prof-hmm-mv-union.json', 'r')
-    for line in f:
-        temp = json.loads(line); gold[temp['docid']] = temp
-
-    path = '/Users/romapatel/Desktop/lstm-tuning/joint/'
-
-    finf = open(path + 'data/dev.txt', 'w+')
-    dict = {'Participants': {'gold': 'mv', 'crowd': 'hmm'}, 'Intervention': {'gold': 'union', 'crowd': 'union'}, 'Outcome': {'gold': 'union', 'crowd': 'mv'}}
-    fin_dict = {}
-    #docid -> [word, pos, p, i, o]
-    for docid in train:
-        fin_dict[docid] = []
-        finf.write('-DOCSTART- -X- O O\n\n')
-        text = ''
-        f = open('/Users/romapatel/Desktop/PICO-data/docs/' + docid + '.txt', 'r')
-        for line in f: text += line
-        tokens = tokenize(text)
-        sents, sent = [], []
-        for item in tokens:
-            token = item[0]
-            if len(token) < 1: continue
-            sent.append(token)
-            if token == '.':
-                sents.append(sent)
-                sent = []
-        tags = []
-        for sent in sents:
-            pos_tags = pos_tag(sent)
-            tags.extend([item[1] for item in pos_tags])
-
-        indices = [[item[1], item[2]] for item in tokens]
-        anno_tags = [['N' for item in tags], ['N' for item in tags], ['N' for item in tags]]
-        for i in range(len(dict.keys())):
-            annotype = dict.keys()[i]
-            anno = annotype[0]
-            if annotype not in dict.keys(): continue
-
-            print annotype
-            agg = dict[annotype]['crowd']
-            print agg
-            if agg not in gold[docid][annotype].keys(): continue
-            spans = gold[docid][annotype][agg]
-            for span in spans:
-                begin, end = index_map(span, indices);
-                for j in range(begin, end):
-                    if j >= len(anno_tags[i]): continue
-                    anno_tags[i][j] = anno
-        for i in range(len(tags)):
-            val = [tokens[i][0], tags[i], anno_tags[0][i], anno_tags[2][i], anno_tags[1][i]]
-            fin_dict[docid].append(val)'''
-
-    '''path = '/Users/romapatel/Desktop/lstm-tuning/joint/'
-
-    f = open(path + '/data/train.json', 'r')
-    for line in f: dict = json.loads(line)
-    f = open(path + '/data/train.txt', 'w+')
-    for docid in dict:
-        f.write('-DOCSTART- -X- O O\n\n')
-        for vec in dict[docid]:
-            val = 'N'
-            if vec[2] == 'P': val = 'P'
-            elif vec[4] == 'O': val = 'O'
-            elif vec[3] == 'I': val = 'I'
-            print vec
-            flag = False
-            word = ''
-            for char in vec[0]:
-                if ord(char) > 128: continue
-                word += char
-            
-            f.write(word + ' ' + vec[1] + ' ' + val + '\n')
-            if vec[0] == '.': f.write('\n')
-        f.write('\n')'''
-        
-
-    
-                
-            
-        
-
-
-
-
-    
