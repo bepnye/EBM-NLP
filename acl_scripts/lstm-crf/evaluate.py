@@ -78,9 +78,12 @@ def main():
     # create dataset
     test  = CoNLLDataset(config.filename_test, config.processing_word,
                          config.processing_tag, config.max_iter)
+    model.evaluate(test)
+    test  = CoNLLDataset('data/student.txt', config.processing_word,
+                         config.processing_tag, config.max_iter)
+    model.evaluate(test)
 
     # evaluate and interact
-    model.evaluate(test)
     #interactive_shell(model)
 
 

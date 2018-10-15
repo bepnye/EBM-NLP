@@ -313,6 +313,9 @@ class NERModel(BaseModel):
         tags = self.idx_to_tag.values()
         stats = { tag: { 'n_correct': 0., 'n_pred': 0., 'n_true': 0. } for tag in tags }
 
+        def div_or_zero(num, den):
+          return num/den if den else 0.0
+
         accs = []
         correct_preds, total_correct, total_preds = 0., 0., 0.
         for words, labels in minibatches(test, self.config.batch_size):
@@ -347,12 +350,12 @@ class NERModel(BaseModel):
         # Token stats
         results = { metric: {} for metric in ['f1', 'p', 'r'] }
         for tag, counts in stats.items():
-          tag_p = counts['n_correct'] / counts['n_pred']
-          tag_r = counts['n_correct'] / counts['n_true']
+          tag_p = div_or_zero(counts['n_correct'], counts['n_pred'])
+          tag_r = div_or_zero(counts['n_correct'], counts['n_true'])
           results['p'][tag] = tag_p
           results['r'][tag] = tag_r
-          results['f1'][tag] = 2 * tag_p * tag_r / (tag_p + tag_r)
-          print '%s: %s' %(tag, '  '.join(['%s=%.2f' %(metric, results[metric][tag]) for metric in results]))
+          results['f1'][tag] = div_or_zero(2.0 * tag_p * tag_r, (tag_p + tag_r))
+          print '%s: %s' %(tag, '  '.join(['%s=%.3f' %(metric, results[metric][tag]) for metric in results]))
 
         macro_results = { metric: np.mean(results[metric].values()) for metric in results }
 

@@ -157,3 +157,40 @@ def print_matrix(matrix, row_names, title):
   for row,name in zip(matrix, row_names):
     print('%s: %s' %(lpad(name, llen), ' '.join([lpad(x if type(x) is str else '%.2f' %x, llen) for x in row])))
 
+def get_multiple_model_phases(phase, element, phase1, phase2):
+  w1, d1 = read_anns(phase, element, ann_type = 'aggregated', model_phase = phase1)
+  w2, d2 = read_anns(phase, element, ann_type = 'aggregated', model_phase = phase2)
+
+  workers = dict(w1.items() + w2.items())
+  docs = {}
+  for pmid, d in d1.items():
+    docs[pmid] = d
+  for pmid, d in d2.items():
+    if pmid not in docs:
+      docs[pmid] = d
+    else:
+      docs[pmid].anns = dict(docs[pmid].anns.items() + d.anns.items())
+  return workers, docs
+
+def write_brat_files(docs):
+  fdir = 'brat/'
+  for pmid, doc in docs.items():
+    offsets = [(0, len(doc.tokens[0]))]
+    text = doc.tokens[0]
+    for token in doc.tokens[1:]:
+      spaced_token = ' ' + token
+      offsets.append((len(text) + 1, len(text) + len(spaced_token)))
+      text += spaced_token
+      assert text[offsets[-1][0]:offsets[-1][1]] == token
+    with open('%s/%s.txt' %(fdir, pmid), 'w') as fp:
+      fp.write(text)
+    with open('%s/%s.test.ann' %(fdir, pmid), 'w') as fp:
+      tid = 0
+      for wid, labels in doc.anns.items():
+        label_spans = condense_labels(labels)
+        for label, token_i, token_f in label_spans:
+          char_i = offsets[token_i][0]
+          char_f = offsets[token_f-1][1]
+          fp.write('T%d\t%s %d %d\t%s\n' %(tid, 'Students' if wid == 'UNION' else 'Upworkers', char_i, char_f, text[char_i:char_f]))
+          tid += 1
+

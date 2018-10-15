@@ -102,44 +102,64 @@ def fname_to_pmid(fname):
     return pmid
 
 def pre_main():
-    id_to_labels = defaultdict(lambda: {})
+    batch_to_labels = {}
     id_to_tokens = {}
     id_to_pos = {}
-    crowd_ids, gold_ids = set(), set()
     PIO = ['participants', 'interventions', 'outcomes']
+
     for pio in PIO:
       print('Reading files for %s' %pio)
-      crowd_labels = glob('../../ebm_nlp_1_00/annotations/aggregated/starting_spans/%s/train/*.ann' %pio)
-      for fname in crowd_labels: crowd_ids.add(fname_to_pmid(fname))
+      for fdir in ['train', 'test/gold', 'test/student']:
+        batch = fdir.split('/')[-1]
+        ann_fnames = glob('../../ebm_nlp_1_00/annotations/aggregated/starting_spans/%s/%s/*.ann' %(pio, fdir))
+        for fname in ann_fnames:
+          pmid = fname_to_pmid(fname)
+          if pmid not in id_to_tokens:
+            tokens, tags = zip(*nltk.pos_tag(open('../../ebm_nlp_1_00/documents/%s.tokens' %pmid).read().split()))
+            id_to_tokens[pmid] = tokens
+            id_to_pos[pmid] = tags
+          if batch not in batch_to_labels:
+            batch_to_labels[batch] = defaultdict(dict)
+          batch_to_labels[batch][pmid][pio] = open(fname).read().split(',')
 
-      test_labels = glob('../../ebm_nlp_1_00/annotations/aggregated/starting_spans/%s/test/gold/*.ann' %pio)
-      for fname in test_labels: gold_ids.add(fname_to_pmid(fname))
+    for batch, batch_labels in batch_to_labels.items():
+      for pmid, labels in batch_labels.items():
+        if len(labels) != len(PIO):
+          print 'Bad annotations for %s %s, only found %s' %(batch, pmid, ''.join(labels.keys()))
 
-      print('processing %d files' %len(crowd_labels + test_labels))
-      for fname in crowd_labels + test_labels:
-        pmid = fname_to_pmid(fname)
-        id_to_labels[pmid][pio] = open(fname).read().split(',')
-        if pmid not in id_to_tokens:
-          tokens, tags = zip(*nltk.pos_tag(open('../../ebm_nlp_1_00/documents/%s.tokens' %pmid).read().split()))
-          id_to_tokens[pmid] = tokens
-          id_to_pos[pmid] = tags
+    batch_to_ids = { batch: set(batch_labels.keys()) for batch, batch_labels in batch_to_labels.items() }
+    for batch, ids in batch_to_ids.items():
+      print 'Found %d ids for %s' %(len(ids), batch)
 
-    crowd_ids = list(filter(lambda pmid: len(id_to_labels[pmid]) == len(PIO), crowd_ids))
-    dev_idx = int(len(crowd_ids) * 0.2)
-    dev_ids, train_ids = crowd_ids[:dev_idx], crowd_ids[dev_idx:]
+    train_ids = list(batch_to_ids['train'] - batch_to_ids['student'] - batch_to_ids['gold'])
+    print 'Using %d ids for train' %len(train_ids)
 
-    gold_ids = list(filter(lambda pmid: len(id_to_labels[pmid]) == len(PIO), gold_ids))
-    test_ids = gold_ids
+    dev_idx = int(len(train_ids) * 0.2)
+    dev_ids, train_ids = set(train_ids[:dev_idx]), set(train_ids[dev_idx:])
+    print 'Split training set in to %d train, %d dev' %(len(train_ids), len(dev_ids))
 
-    for ids, fname in [(dev_ids, 'dev'), (train_ids, 'train'), (test_ids, 'test')]:
-      fout = open('data/%s.txt' %fname, 'w')
-      for pmid in ids:
+    batch_to_labels['dev'] = defaultdict(dict)
+    for pmid in dev_ids:
+      batch_to_labels['dev'][pmid] = batch_to_labels['train'][pmid]
+    for pmid in batch_to_labels['train'].keys():
+      if pmid not in train_ids:
+        del batch_to_labels['train'][pmid]
+
+    print 'Final batch sizes:'
+    for batch, batch_labels in batch_to_labels.items():
+      print '%s: %d' %(batch, len(batch_labels))
+
+    for batch, id_to_labels in batch_to_labels.items():
+      fout = open('data/%s.txt' %batch, 'w')
+      for pmid in id_to_labels:
         fout.write('-DOCSTART- -X- O O\n\n')
-        for i, (token, pos) in enumerate(zip(id_to_tokens[pmid], id_to_pos[pmid])):
+        tokens = id_to_tokens[pmid]
+        poss = id_to_pos[pmid]
+        for i, (token, pos) in enumerate(zip(tokens, poss)):
           labels = [int(id_to_labels[pmid][pio][i]) for pio in PIO]
           label = 'N'
           for pio, is_applied in zip(PIO, labels):
-            if is_applied:
+            if is_applied and label == 'N':
               label = pio[0]
           fout.write('%s %s %s\n' %(token, pos, label))
           if token == '.': fout.write('\n')
