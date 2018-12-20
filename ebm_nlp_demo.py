@@ -1,7 +1,7 @@
-import os
+import os, random
 from glob import glob
 from itertools import groupby, combinations
-from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import cohen_kappa_score, precision_score, recall_score, precision_recall_fscore_support
 
 DATA_DIR = 'ebm_nlp_1_00/'
 PHASES = ('starting_spans', 'hierarchical_labels')
@@ -52,7 +52,7 @@ def lpad(inp, n, min_buf=0):
 
 class Doc:
   def __init__(self, pmid, phase, element):
-    with open(os.path.join(DATA_DIR, 'documents', '%s.text' %pmid)) as fp:
+    with open(os.path.join(DATA_DIR, 'documents', '%s.txt' %pmid)) as fp:
       self.text = fp.read()
     with open(os.path.join(DATA_DIR, 'documents', '%s.tokens' %pmid)) as fp:
       self.tokens = fp.read().split(' ')
@@ -79,7 +79,7 @@ def read_anns(phase, element, ann_type = 'aggregated', model_phase = 'train'):
   print('Found %d files in %s' %(len(fnames), fdir))
 
   for fname in fnames:
-    labels = map(int, open(fname).read().strip().split(','))
+    labels = [int(i) for i in open(fname).read().strip().split(',')]
     pmid, wid = os.path.basename(fname).split('.')[0].split('_')
     if pmid not in docs:
       docs[pmid] = Doc(pmid, phase, element)
@@ -157,11 +157,15 @@ def print_matrix(matrix, row_names, title):
   for row,name in zip(matrix, row_names):
     print('%s: %s' %(lpad(name, llen), ' '.join([lpad(x if type(x) is str else '%.2f' %x, llen) for x in row])))
 
-def get_multiple_model_phases(phase, element, phase1, phase2):
-  w1, d1 = read_anns(phase, element, ann_type = 'aggregated', model_phase = phase1)
-  w2, d2 = read_anns(phase, element, ann_type = 'aggregated', model_phase = phase2)
+def add_dicts(d1, d2):
+  d = d1.copy()
+  d.update(d2)
+  return d
 
-  workers = dict(w1.items() + w2.items())
+def combine_model_phases(p1_data, p2_data):
+  w1, d1 = p1_data
+  w2, d2 = p2_data
+  workers = add_dicts(w1, w2)
   docs = {}
   for pmid, d in d1.items():
     docs[pmid] = d
@@ -169,11 +173,40 @@ def get_multiple_model_phases(phase, element, phase1, phase2):
     if pmid not in docs:
       docs[pmid] = d
     else:
-      docs[pmid].anns = dict(docs[pmid].anns.items() + d.anns.items())
+      docs[pmid].anns = dict(list(docs[pmid].anns.items()) + list(d.anns.items()))
   return workers, docs
 
+def get_multiple_model_phases(phase, element, ann_type, phase1, phase2):
+  p1 = read_anns(phase, element, ann_type, model_phase = phase1)
+  p2 = read_anns(phase, element, ann_type, model_phase = phase2)
+  return combine_model_phases(p1, p2)
+
+def get_wid_color(wid):
+  if wid == 'AGGREGATED':
+    r = 0
+    g = 150
+    b = 50
+  elif wid == 'UNION':
+    r = 0
+    g = 250
+    b = 150
+  else:
+    r = int(random.random()*255)
+    g = int(random.random()*126)
+    b = 255
+  color = '{:02x}{:02x}{:02x}'.format(r, g, b)
+  return color
+
 def write_brat_files(docs):
+  wid_translator = { 'AGGREGATED': 'Upwork', 'UNION': 'Student' }
   fdir = 'brat/'
+  while True:
+    if not os.path.isdir(fdir):
+      print('Please create the target directory: %s' %fdir)
+      input('press [enter] when done  ')
+    else:
+      break
+  wids = set()
   for pmid, doc in docs.items():
     offsets = [(0, len(doc.tokens[0]))]
     text = doc.tokens[0]
@@ -186,11 +219,27 @@ def write_brat_files(docs):
       fp.write(text)
     with open('%s/%s.test.ann' %(fdir, pmid), 'w') as fp:
       tid = 0
-      for wid, labels in doc.anns.items():
-        label_spans = condense_labels(labels)
+      doc_wids = sorted(doc.anns.keys(), reverse = True)
+      for wid in doc_wids:
+        wids.add(wid)
+        label_spans = condense_labels(doc.anns[wid])
         for label, token_i, token_f in label_spans:
           char_i = offsets[token_i][0]
           char_f = offsets[token_f-1][1]
-          fp.write('T%d\t%s %d %d\t%s\n' %(tid, 'Students' if wid == 'UNION' else 'Upworkers', char_i, char_f, text[char_i:char_f]))
+          fp.write('T%d\t%s %d %d\t%s\n' %(tid, wid_translator.get(wid, wid), char_i, char_f, text[char_i:char_f]))
           tid += 1
-
+  with open('%s/annotation.conf' %fdir, 'w') as fp:
+    fp.write('[entities]\n\n')
+    for wid in wids:
+      wid = wid_translator.get(wid,wid)
+      fp.write(wid+'\n')
+    fp.write('[relations]\n\n')
+    fp.write('<OVERLAP> Arg1:<ENTITY>, Arg2:<ENTITY>, <OVL-TYPE>:<ANY>\n\n')
+    fp.write('[events]\n\n')
+    fp.write('[attributes]\n\n')
+  with open('%s/visual.conf' %fdir, 'w') as fp:
+    fp.write('[drawing]\n\n')
+    for wid in wids:
+      color = get_wid_color(wid)
+      wid = wid_translator.get(wid,wid)
+      fp.write('%s bgColor:#%s\n' %(wid, color))

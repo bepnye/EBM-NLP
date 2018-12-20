@@ -1,0 +1,190 @@
+2018-10-09 10:58:40,938:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 10:58:40,939:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 10:58:42,976:INFO: Initializing tf session
+2018-10-09 10:58:43,982:INFO: Reloading the latest trained model...
+2018-10-09 10:58:43,983:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-09 10:58:44,170:INFO: Testing model over test set
+2018-10-09 10:59:04,958:INFO: f1 0.72 - p 0.69 - r 0.77
+2018-10-09 10:59:04,958:INFO: Testing model over test set
+2018-10-09 11:02:43,229:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 11:02:43,229:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 11:02:45,279:INFO: Initializing tf session
+2018-10-09 11:02:46,314:INFO: Reloading the latest trained model...
+2018-10-09 11:02:46,314:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-09 11:02:46,503:INFO: Testing model over test set
+2018-10-09 11:03:08,059:INFO: f1 0.72 - p 0.69 - r 0.77
+2018-10-09 11:03:08,059:INFO: Testing model over test set
+2018-10-09 11:03:29,028:INFO: f1 0.40 - p 0.41 - r 0.40
+2018-10-09 11:03:29,028:INFO: Testing model over test set
+2018-10-09 11:03:49,864:INFO: f1 0.35 - p 0.36 - r 0.36
+2018-10-09 11:03:49,864:INFO: Testing model over test set
+2018-10-09 11:04:10,693:INFO: f1 0.39 - p 0.41 - r 0.37
+2018-10-09 11:04:59,724:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 11:04:59,725:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 11:05:01,837:INFO: Initializing tf session
+2018-10-09 11:05:02,853:INFO: Reloading the latest trained model...
+2018-10-09 11:05:02,853:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-09 11:05:03,030:INFO: Testing model over test set
+2018-10-09 11:05:24,219:INFO: f1 0.72 - p 0.69 - r 0.77
+2018-10-09 11:05:24,219:INFO: Testing model over test set
+2018-10-09 11:05:44,344:INFO: f1 0.40 - p 0.41 - r 0.40
+2018-10-09 11:05:44,344:INFO: Testing model over test set
+2018-10-09 11:06:04,540:INFO: f1 0.35 - p 0.36 - r 0.36
+2018-10-09 11:06:04,540:INFO: Testing model over test set
+2018-10-09 11:06:25,041:INFO: f1 0.39 - p 0.41 - r 0.37
+2018-10-09 11:19:37,555:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 11:19:37,556:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 11:19:39,689:INFO: Initializing tf session
+2018-10-09 11:19:41,656:INFO: Epoch 1 out of 15
+2018-10-09 11:44:58,921:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 11:44:58,921:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 11:45:01,009:INFO: Initializing tf session
+2018-10-09 11:45:02,846:INFO: Epoch 1 out of 15
+2018-10-09 12:09:30,125:INFO: f1 0.63 - r 0.59 - p 0.73
+2018-10-09 12:09:30,771:INFO: - new best score!
+2018-10-09 12:09:30,771:INFO: Epoch 2 out of 15
+2018-10-09 12:32:22,870:INFO: f1 0.66 - r 0.62 - p 0.74
+2018-10-09 12:32:23,375:INFO: - new best score!
+2018-10-09 12:32:23,375:INFO: Epoch 3 out of 15
+2018-10-09 12:56:15,812:INFO: f1 0.68 - r 0.64 - p 0.75
+2018-10-09 12:56:16,390:INFO: - new best score!
+2018-10-09 12:56:16,390:INFO: Epoch 4 out of 15
+2018-10-09 13:20:19,991:INFO: f1 0.68 - r 0.63 - p 0.76
+2018-10-09 13:20:19,991:INFO: Epoch 5 out of 15
+2018-10-09 13:42:24,848:INFO: f1 0.68 - r 0.63 - p 0.77
+2018-10-09 13:42:24,848:INFO: Epoch 6 out of 15
+2018-10-09 14:05:14,590:INFO: f1 0.68 - r 0.63 - p 0.77
+2018-10-09 14:05:15,099:INFO: - new best score!
+2018-10-09 14:05:15,099:INFO: Epoch 7 out of 15
+2018-10-09 14:28:35,234:INFO: f1 0.69 - r 0.65 - p 0.76
+2018-10-09 14:28:35,815:INFO: - new best score!
+2018-10-09 14:28:35,816:INFO: Epoch 8 out of 15
+2018-10-09 14:52:31,183:INFO: f1 0.70 - r 0.67 - p 0.76
+2018-10-09 14:52:31,816:INFO: - new best score!
+2018-10-09 14:52:31,816:INFO: Epoch 9 out of 15
+2018-10-09 15:18:02,148:INFO: f1 0.70 - r 0.67 - p 0.76
+2018-10-09 15:18:02,151:INFO: Epoch 10 out of 15
+2018-10-09 15:43:09,402:INFO: f1 0.71 - r 0.67 - p 0.76
+2018-10-09 15:43:10,066:INFO: - new best score!
+2018-10-09 15:43:10,067:INFO: Epoch 11 out of 15
+2018-10-09 23:51:03,778:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 23:51:03,779:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 23:51:05,866:INFO: Initializing tf session
+2018-10-09 23:51:08,301:INFO: Epoch 1 out of 15
+2018-10-09 23:52:01,385:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-09 23:52:01,408:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-09 23:52:03,399:INFO: Initializing tf session
+2018-10-09 23:52:05,154:INFO: Epoch 1 out of 15
+2018-10-10 00:18:50,386:INFO: f1 0.63 - r 0.58 - p 0.75
+2018-10-10 00:18:51,027:INFO: - new best score!
+2018-10-10 00:18:51,027:INFO: Epoch 2 out of 15
+2018-10-10 00:44:21,744:INFO: f1 0.65 - r 0.60 - p 0.76
+2018-10-10 00:44:22,273:INFO: - new best score!
+2018-10-10 00:44:22,273:INFO: Epoch 3 out of 15
+2018-10-10 01:06:15,667:INFO: f1 0.67 - r 0.62 - p 0.76
+2018-10-10 01:06:16,290:INFO: - new best score!
+2018-10-10 01:06:16,290:INFO: Epoch 4 out of 15
+2018-10-10 01:28:12,169:INFO: f1 0.68 - r 0.64 - p 0.75
+2018-10-10 01:28:12,778:INFO: - new best score!
+2018-10-10 01:28:12,778:INFO: Epoch 5 out of 15
+2018-10-10 01:50:11,212:INFO: f1 0.69 - r 0.65 - p 0.76
+2018-10-10 01:50:11,804:INFO: - new best score!
+2018-10-10 01:50:11,805:INFO: Epoch 6 out of 15
+2018-10-10 02:12:27,131:INFO: f1 0.70 - r 0.67 - p 0.74
+2018-10-10 02:12:27,684:INFO: - new best score!
+2018-10-10 02:12:27,684:INFO: Epoch 7 out of 15
+2018-10-10 02:34:41,404:INFO: f1 0.71 - r 0.68 - p 0.75
+2018-10-10 02:34:41,951:INFO: - new best score!
+2018-10-10 02:34:41,951:INFO: Epoch 8 out of 15
+2018-10-10 02:56:59,931:INFO: f1 0.71 - r 0.68 - p 0.75
+2018-10-10 02:57:00,559:INFO: - new best score!
+2018-10-10 02:57:00,560:INFO: Epoch 9 out of 15
+2018-10-10 03:19:21,372:INFO: f1 0.71 - r 0.68 - p 0.75
+2018-10-10 03:19:21,379:INFO: Epoch 10 out of 15
+2018-10-10 03:42:37,513:INFO: f1 0.71 - r 0.68 - p 0.75
+2018-10-10 03:42:38,124:INFO: - new best score!
+2018-10-10 03:42:38,124:INFO: Epoch 11 out of 15
+2018-10-10 04:04:34,805:INFO: f1 0.71 - r 0.68 - p 0.74
+2018-10-10 04:04:34,816:INFO: Epoch 12 out of 15
+2018-10-10 04:26:32,836:INFO: f1 0.71 - r 0.68 - p 0.74
+2018-10-10 04:26:32,844:INFO: Epoch 13 out of 15
+2018-10-10 04:48:38,622:INFO: f1 0.71 - r 0.69 - p 0.73
+2018-10-10 04:48:38,633:INFO: - early stopping 3 epochs without improvement
+2018-10-10 07:25:15,297:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-10 07:25:15,298:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-10 07:25:17,291:INFO: Initializing tf session
+2018-10-10 07:25:18,125:INFO: Reloading the latest trained model...
+2018-10-10 07:25:18,125:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-10 07:25:18,306:INFO: Testing model over test set
+2018-10-10 07:25:38,471:INFO: f1 0.71 - p 0.68 - r 0.76
+2018-10-10 07:25:38,471:INFO: Testing model over test set
+2018-10-10 09:07:44,526:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-10 09:07:44,527:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-10 09:07:46,566:INFO: Initializing tf session
+2018-10-10 09:07:47,613:INFO: Reloading the latest trained model...
+2018-10-10 09:07:47,613:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-10 09:07:47,805:INFO: Testing model over test set
+2018-10-10 09:08:14,657:INFO: f1 0.71 - p 0.68 - r 0.76
+2018-10-10 09:09:49,117:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:417: calling reverse_sequence (from tensorflow.python.ops.array_ops) with seq_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+seq_dim is deprecated, use seq_axis instead
+2018-10-10 09:09:49,118:WARNING: From /usr/local/lib/python2.7/site-packages/tensorflow/python/util/deprecation.py:432: calling reverse_sequence (from tensorflow.python.ops.array_ops) with batch_dim is deprecated and will be removed in a future version.
+Instructions for updating:
+batch_dim is deprecated, use batch_axis instead
+2018-10-10 09:09:51,095:INFO: Initializing tf session
+2018-10-10 09:09:52,138:INFO: Reloading the latest trained model...
+2018-10-10 09:09:52,138:INFO: Restoring parameters from /Users/ben/Desktop/ebm_nlp/repo/acl_scripts/lstm-crf/results/test/model.weights/
+2018-10-10 09:09:52,327:INFO: Testing model over test set
+2018-10-10 09:10:12,436:INFO: f1 0.71 - p 0.68 - r 0.76
+2018-10-10 09:10:12,436:INFO: Testing model over test set
+2018-10-10 09:10:32,562:INFO: f1 0.69 - p 0.71 - r 0.69
+2018-12-12 08:18:59,389:INFO: Initializing tf session
+2018-12-12 08:19:00,541:INFO: Epoch 1 out of 15
+2018-12-12 08:21:51,649:INFO: r 0.52 - f1 0.57 - p 0.68
+2018-12-12 08:21:52,183:INFO: - new best score!
+2018-12-12 08:21:52,184:INFO: Epoch 2 out of 15
+2018-12-12 08:24:39,724:INFO: r 0.55 - f1 0.60 - p 0.72
+2018-12-12 08:24:40,128:INFO: - new best score!
+2018-12-12 08:24:40,128:INFO: Epoch 3 out of 15
+2018-12-12 08:27:06,661:INFO: r 0.59 - f1 0.63 - p 0.69
+2018-12-12 08:27:07,034:INFO: - new best score!
+2018-12-12 08:27:07,034:INFO: Epoch 4 out of 15
+2018-12-12 08:29:48,584:INFO: r 0.59 - f1 0.64 - p 0.72
+2018-12-12 08:29:48,920:INFO: - new best score!
+2018-12-12 08:29:48,920:INFO: Epoch 5 out of 15
