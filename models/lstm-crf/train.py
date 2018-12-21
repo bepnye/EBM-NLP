@@ -1,3 +1,4 @@
+import os
 from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
 from model.base_model import BaseModel
