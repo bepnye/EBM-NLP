@@ -188,3 +188,5 @@ batch_dim is deprecated, use batch_axis instead
 2018-12-12 08:29:48,584:INFO: r 0.59 - f1 0.64 - p 0.72
 2018-12-12 08:29:48,920:INFO: - new best score!
 2018-12-12 08:29:48,920:INFO: Epoch 5 out of 15
+2019-01-08 21:40:32,363:INFO: Initializing tf session
+2019-01-08 21:40:34,595:INFO: Epoch 1 out of 15

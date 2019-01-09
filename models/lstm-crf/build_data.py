@@ -132,7 +132,8 @@ def preprocess_data():
           for fname in ann_fnames:
             pmid = fname_to_pmid(fname)
             if pmid not in id_to_tokens:
-              tokens, tags = zip(*nltk.pos_tag(open('%s/documents/%s.tokens' %(ebm_nlp, pmid)).read().split()))
+              tokens = open('%s/documents/%s.tokens' %(ebm_nlp, pmid)).read().split()
+              tags   = open('%s/documents/%s.pos'    %(ebm_nlp, pmid)).read().split()
               id_to_tokens[pmid] = tokens
               id_to_pos[pmid] = tags
             batch_to_labels[phase][pio][batch][pmid] = open(fname).read().split()

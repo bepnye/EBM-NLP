@@ -198,7 +198,6 @@ def get_wid_color(wid):
   return color
 
 def write_brat_files(docs):
-  wid_translator = { 'AGGREGATED': 'Upwork', 'UNION': 'Student' }
   fdir = 'brat/'
   while True:
     if not os.path.isdir(fdir):
@@ -226,7 +225,7 @@ def write_brat_files(docs):
         for label, token_i, token_f in label_spans:
           char_i = offsets[token_i][0]
           char_f = offsets[token_f-1][1]
-          fp.write('T%d\t%s %d %d\t%s\n' %(tid, wid_translator.get(wid, wid), char_i, char_f, text[char_i:char_f]))
+          fp.write('T%d\t%s %d %d\t%s\n' %(tid, label, char_i, char_f, text[char_i:char_f]))
           tid += 1
   with open('%s/annotation.conf' %fdir, 'w') as fp:
     fp.write('[entities]\n\n')
