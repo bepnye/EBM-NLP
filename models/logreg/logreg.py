@@ -13,7 +13,6 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 sys.path.append('../')
 import eval
 
-LEMMATIZER = nltk.stem.WordNetLemmatizer()
 DOC_PKL = 'docs.pkl'
 #EMBEDDINGS = 'embeddings.pkl'
 #EMBEDDING_SIZE = 200
@@ -23,41 +22,21 @@ UNK = '<UNK>'
 BOS = '<BOS>'
 EOS = '<EOS>'
 
-def get_wordnet_pos(pos):
-  if pos.startswith('J'): return nltk.corpus.wordnet.ADJ
-  if pos.startswith('V'): return nltk.corpus.wordnet.VERB
-  if pos.startswith('N'): return nltk.corpus.wordnet.NOUN
-  if pos.startswith('R'): return nltk.corpus.wordnet.ADV
-  return pos
-
-def lemmatize(token_pos_pair):
-  (token, pos) = token_pos_pair
-  try:
-    return LEMMATIZER.lemmatize(token, pos = get_wordnet_pos(pos)).lower()
-  except KeyError:
-    return LEMMATIZER.lemmatize(token).lower()
-
 def build_data():
 
-  print('Reading, lemmatizing, and pos taggings documents...')
+  print('Reading documents...')
 
   docs = {}
   doc_fnames = glob('%s/documents/*.tokens' %(TOP))
-  all_tokens = set()
 
   for i, fname in enumerate(doc_fnames):
     pmid = os.path.basename(fname).split('.')[0]
 
     tokens = open(fname).read().split()
     tags = open(fname.replace('tokens', 'pos')).read().split()
-    tagged_tokens = list(zip(tokens, tags))
-    lemmas = list(map(lemmatize, tagged_tokens))
     docs[pmid] = {}
     docs[pmid]['tokens'] = tokens
-    docs[pmid]['lemmas'] = lemmas
-    docs[pmid]['pos'] = [p[:2] for p in tags]
-
-    all_tokens.update(tokens)
+    docs[pmid]['pos'] = tags
 
     if (i//100 != (i-1)//100):
       sys.stdout.write('\r\tprocessed %04d / %04d docs' %(i, len(doc_fnames)))
@@ -67,30 +46,10 @@ def build_data():
     print('\nWriting doc data to %s' %DOC_PKL)
     pickle.dump(docs, fout)
 
-  #if not os.path.isfile(EMBEDDINGS):
-  #  print 'Formatting word vectors'
-  #  embeddings = {}
-  #  source_embeddings = open('PubMed-w2v.txt')
-  #  for l in source_embeddings:
-  #    e = l.strip().split()
-  #    if len(e) < EMBEDDING_SIZE:
-  #      continue
-  #    if e[0] in all_tokens:
-  #      embeddings[e[0]] = map(float, e[1:])
-  #  with open(EMBEDDINGS, 'w') as fout:
-  #    pickle.dump(embeddings, fout)
-
   return docs
 
 def get_idx(e, vocab):
   return vocab.get(e, vocab[UNK])
-
-def get_emb(e, embeddings):
-  if e in embeddings:
-    return embeddings[e]
-  else:
-    return [0.]*EMBEDDING_SIZE
-  
 
 def get_X(pmids, vocabs, docs):
   indptr = [0]
@@ -98,8 +57,7 @@ def get_X(pmids, vocabs, docs):
   data = []
   window_size = 1
   for pmid in pmids:
-    n = len(docs[pmid]['lemmas'])
-    lemmas = [BOS]*window_size + docs[pmid]['lemmas'] + [EOS]*window_size
+    n = len(docs[pmid]['tokens'])
     pos    = [BOS]*window_size + docs[pmid]['pos']    + [EOS]*window_size
     tokens = [BOS]*window_size + docs[pmid]['tokens'] + [EOS]*window_size
     for i in range(window_size, n+window_size):
@@ -107,17 +65,17 @@ def get_X(pmids, vocabs, docs):
 
       for token_offset in range(-window_size, window_size+1):
         data.append(1)
-        indices.append(col_offset + get_idx(lemmas[i + token_offset], vocabs['lemmas']))
-        col_offset += len(vocabs['lemmas'])
+        indices.append(col_offset + get_idx(tokens[i + token_offset], vocabs['tokens']))
+        col_offset += len(vocabs['tokens'])
 
         data.append(1)
         indices.append(col_offset + get_idx(pos[i + token_offset], vocabs['pos']))
         col_offset += len(vocabs['pos'])
 
-      data.append(int(lemmas[i].isdigit()))
+      data.append(int(tokens[i].isdigit()))
       indices.append(col_offset + 0); col_offset += 1
 
-      data.append(int(lemmas[i].isalpha()))
+      data.append(int(tokens[i].isalpha()))
       indices.append(col_offset + 0); col_offset += 1
 
       data.append(int(tokens[i].isupper()))
@@ -155,8 +113,20 @@ def logreg(phase = 'hierarchical_labels', pio = 'participants', docs = None):
 
   assert len(set(test_pmids) & set(train_pmids)) == 0
 
-  vocabs = { 'lemmas': [UNK, BOS, EOS], 'pos': [UNK, BOS, EOS] }
-  for etype, cutoff in [('lemmas', 20), ('pos', 0)]:
+  for pmid in train_pmids:
+    try:
+      assert len(docs[pmid]['tokens']) == len(train_labels[pmid])
+    except AssertionError:
+      print('train_X: token / label mismatch for %s, %d != %d' %(pmid, len(docs[pmid]['tokens']), len(train_labels[pmid])))
+  for pmid in test_pmids:
+    try:
+      assert len(docs[pmid]['tokens']) == len(test_labels[pmid])
+    except AssertionError:
+      print('test_X: token / label mismatch for %s, %d != %d' %(pmid, len(docs[pmid]['tokens']), len(test_labels[pmid])))
+      raise
+
+  vocabs = { 'tokens': [UNK, BOS, EOS], 'pos': [UNK, BOS, EOS] }
+  for etype, cutoff in [('tokens', 20), ('pos', 0)]:
     counts = defaultdict(lambda: 0)
     for pmid in train_pmids:
       for e in docs[pmid][etype]:
@@ -173,8 +143,8 @@ def logreg(phase = 'hierarchical_labels', pio = 'participants', docs = None):
   X = get_X(train_pmids, vocabs, docs)
   print('Built X, shape = %s' %(str(X.shape)))
   Y = get_Y(train_pmids, train_labels)
-  labels = sorted(list(set(Y) - set('0')))
   print('Built Y, shape = (%d, 1)' %(len(Y)))
+  labels = sorted(list(set(Y) - set('0')))
   
   print('Fitting model')
   model.fit(X,Y)
@@ -191,14 +161,6 @@ def logreg(phase = 'hierarchical_labels', pio = 'participants', docs = None):
   Yp = []
   for pmid in test_pmids:
     Yp += pred_labels[pmid]
-
-  prec=precision_score(Yt,Yp,labels,average='macro')
-  rec=recall_score(Yt,Yp,labels,average='macro')
-  f1=2*prec*rec/(prec+rec)
-  print('f1 = %.2f, precision = %.2f, recall = %.2f' %(f1, prec, rec))
-  print('Class precision: ', precision_score(Yt,Yp,labels,average=None))
-  print('Class recall:    ', recall_score(Yt,Yp,labels,average=None))
-  print()
 
   eval.eval_labels(TOP, pred_labels, phase, pio)
 

@@ -2,6 +2,9 @@ import numpy as np
 import os
 import tensorflow as tf
 
+import sys
+sys.path.append('../')
+import eval
 
 from .data_utils import minibatches, pad_sequences, get_chunks, NONE
 from .general_utils import Progbar
@@ -316,6 +319,9 @@ class NERModel(BaseModel):
         def div_or_zero(num, den):
           return num/den if den else 0.0
 
+        l_true = []
+        l_pred = []
+
         accs = []
         correct_preds, total_correct, total_preds = 0., 0., 0.
         for words, labels in minibatches(test, self.config.batch_size):
@@ -327,41 +333,11 @@ class NERModel(BaseModel):
                 lab_pred = lab_pred[:length]
                 accs    += [a==b for (a, b) in zip(lab, lab_pred)]
 
-                for l_true, l_pred in zip(lab, lab_pred):
-                  if l_true == l_pred:
-                    stats[self.idx_to_tag[l_true]]['n_correct'] += 1
-                  stats[self.idx_to_tag[l_true]]['n_true'] += 1
-                  stats[self.idx_to_tag[l_pred]]['n_pred'] += 1
-
-
-                lab_chunks      = set(get_chunks(lab, self.config.vocab_tags))
-                lab_pred_chunks = set(get_chunks(lab_pred, self.config.vocab_tags))
-
-                #correct_preds += len(lab_chunks & lab_pred_chunks)
-                #total_preds   += len(lab_pred_chunks)
-                #total_correct += len(lab_chunks)
-
-        # Span stats
-        p   = correct_preds / total_preds if correct_preds > 0 else 0
-        r   = correct_preds / total_correct if correct_preds > 0 else 0
-        f1  = 2 * p * r / (p + r) if correct_preds > 0 else 0
-        acc = np.mean(accs)
+                l_true += lab
+                l_pred += lab_pred
 
         # Token stats
-        results = { metric: {} for metric in ['f1', 'p', 'r'] }
-        for tag, counts in list(stats.items()):
-          if tag == 'N': # majority negative class
-            continue
-          tag_p = div_or_zero(counts['n_correct'], counts['n_pred'])
-          tag_r = div_or_zero(counts['n_correct'], counts['n_true'])
-          results['p'][tag] = tag_p
-          results['r'][tag] = tag_r
-          results['f1'][tag] = div_or_zero(2.0 * tag_p * tag_r, (tag_p + tag_r))
-          print('%s: %s' %(tag, '  '.join(['%s=%.3f' %(metric, results[metric][tag]) for metric in results])))
-
-        macro_results = { metric: np.mean(list(results[metric].values())) for metric in results }
-
-        return macro_results
+        return eval.token_f1(true = l_true, pred = l_pred, labels = tags)
 
 
     def predict(self, words_raw):

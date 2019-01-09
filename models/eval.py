@@ -78,7 +78,7 @@ def vanilla_tokens(pmids, pred_labels, test_labels, labels):
     assert len(pred_labels[pmid]) == len(test_labels[pmid])
     y_pred += pred_labels[pmid]
     y_test += test_labels[pmid]
-  token_f1(y_test, y_pred, labels)
+  token_f1(true = y_test, pred = y_pred, labels = labels)
 
 def sw_tokens(pmids, pred_labels, test_labels, labels):
   y_pred = []
@@ -89,9 +89,9 @@ def sw_tokens(pmids, pred_labels, test_labels, labels):
     token_mask = [t in stops for t in tokens]
     y_pred += apply_bitmask(pred_labels[pmid], token_mask)
     y_test += apply_bitmask(test_labels[pmid], token_mask)
-  token_f1(y_test, y_pred, labels)
+  token_f1(true = y_test, pred = y_pred, labels = labels)
 
-def eval_labels(ebm_nlp_dir, pred_labels, phase, pio, eval_func = sw_tokens):
+def eval_labels(ebm_nlp_dir, pred_labels, phase, pio, eval_func = vanilla_tokens):
   global EBM_NLP
   EBM_NLP = ebm_nlp_dir
 
@@ -106,11 +106,14 @@ def eval_labels(ebm_nlp_dir, pred_labels, phase, pio, eval_func = sw_tokens):
 
   eval_func(pmids, pred_labels, test_labels, labels)
 
-def token_f1(y_test, y_pred, labels):
+def token_f1(true, pred, labels):
 
-  prec = precision_score(y_test, y_pred, labels = labels, average='micro')
-  rec = recall_score(y_test, y_pred, labels = labels, average='micro')
+  prec = precision_score(true, pred, labels = labels, average='micro')
+  rec = recall_score(true, pred, labels = labels, average='micro')
   f1=2*prec*rec/(prec+rec)
-  print('f1 = %.2f, precision = %.2f, recall = %.2f' %(f1, prec, rec))
-  print('Class precision: ', precision_score(y_test,y_pred,labels,average=None))
-  print('Class recall:    ', recall_score(y_test,y_pred,labels,average=None))
+  print('f1        = %.2f' %f1)
+  print('precision = %.2f' %prec)
+  print('recall    = %.2f' %rec)
+  print('Class precision: ', [round(x, 2) for x in precision_score(true,pred,labels,average=None)])
+  print('Class recall:    ', [round(x, 2) for x in recall_score(true,pred,labels,average=None)])
+  return { 'f1': f1, 'precision': prec, 'recall': rec }

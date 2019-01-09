@@ -119,6 +119,14 @@ def preprocess_data():
     PIO = ['participants', 'interventions', 'outcomes']
     PHASES = ['starting_spans', 'hierarchical_labels']
 
+    token_fnames = glob('%s/documents/*.tokens' %ebm_nlp)
+    for fname in token_fnames:
+      pmid = fname_to_pmid(fname)
+      tokens = open(fname).read().split()
+      tags   = open(fname.replace('tokens', 'pos')).read().split()
+      id_to_tokens[pmid] = tokens
+      id_to_pos[pmid] = tags
+
     batch_to_labels = {}
     for phase in PHASES:
       batch_to_labels[phase] = {}
@@ -131,11 +139,6 @@ def preprocess_data():
           ann_fnames = glob('%s/annotations/aggregated/%s/%s/%s/*.ann' %(ebm_nlp, phase, pio, fdir))
           for fname in ann_fnames:
             pmid = fname_to_pmid(fname)
-            if pmid not in id_to_tokens:
-              tokens = open('%s/documents/%s.tokens' %(ebm_nlp, pmid)).read().split()
-              tags   = open('%s/documents/%s.pos'    %(ebm_nlp, pmid)).read().split()
-              id_to_tokens[pmid] = tokens
-              id_to_pos[pmid] = tags
             batch_to_labels[phase][pio][batch][pmid] = open(fname).read().split()
 
     batch_groups = [('p1_all', ['starting_spans'], ['participants', 'interventions', 'outcomes']),
