@@ -106,6 +106,9 @@ def eval_labels(ebm_nlp_dir, pred_labels, phase, pio, eval_func = vanilla_tokens
 
   eval_func(pmids, pred_labels, test_labels, labels)
 
+def f1(prec, rec):
+  return 2*prec*rec/(prec+rec)
+
 def token_f1(true, pred, labels):
 
   print(true[:30])
@@ -114,10 +117,13 @@ def token_f1(true, pred, labels):
 
   prec = precision_score(true, pred, labels = labels, average='micro')
   rec = recall_score(true, pred, labels = labels, average='micro')
-  f1=2*prec*rec/(prec+rec)
-  print('f1        = %.2f' %f1)
+  print('f1        = %.2f' %f1(prec, rec))
   print('precision = %.2f' %prec)
   print('recall    = %.2f' %rec)
-  print('Class precision: ', [round(x, 2) for x in precision_score(true,pred,labels,average=None)])
-  print('Class recall:    ', [round(x, 2) for x in recall_score(true,pred,labels,average=None)])
+  class_scores = zip(labels, precision_score(true,pred,labels,average=None), recall_score(true,pred,labels,average=None))
+  for label, prec, rec in class_scores:
+    print('Label: %s' %label)
+    print('\tf1        = %.2f' %f1(prec, rec))
+    print('\tprecision = %.2f' %prec)
+    print('\trecall    = %.2f' %rec)
   return { 'f1': f1, 'precision': prec, 'recall': rec }

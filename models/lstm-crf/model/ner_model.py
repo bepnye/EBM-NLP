@@ -335,6 +335,8 @@ class NERModel(BaseModel):
                 l_pred += lab_pred
 
         # Token stats
+        print('Passing LSTM-CRF tags to eval func:')
+        print('\t', self.idx_to_tag.items())
         tags = [idx for idx, tag in self.idx_to_tag.items() if tag != NONE]
         return eval.token_f1(true = l_true, pred = l_pred, labels = tags)
 
