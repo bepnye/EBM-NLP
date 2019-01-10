@@ -335,7 +335,7 @@ class NERModel(BaseModel):
                 l_pred += lab_pred
 
         # Token stats
-        tags = list(self.idx_to_tag.keys())
+        tags = [idx for idx, tag in self.idx_to_tag.items() if tag != NONE]
         return eval.token_f1(true = l_true, pred = l_pred, labels = tags)
 
 
