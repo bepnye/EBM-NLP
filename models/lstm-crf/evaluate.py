@@ -2,6 +2,7 @@ from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
 from model.config import Config
 
+import sys, os
 
 def align_data(data):
     """Given dict with lists, creates aligned strings
@@ -66,9 +67,15 @@ input> I love Paris""")
             model.logger.info(seq)
 
 
-def main():
+def main(data_prefix = None):
     # create instance of config
     config = Config()
+    
+    if data_prefix:
+      cwd = os.getcwd()
+      config.filename_dev   = os.path.join(cwd, 'data', data_prefix + '_' + os.path.basename(config.filename_dev))
+      config.filename_test  = os.path.join(cwd, 'data', data_prefix + '_' + os.path.basename(config.filename_test))
+      config.filename_train = os.path.join(cwd, 'data', data_prefix + '_' + os.path.basename(config.filename_train))
 
     # build model
     model = NERModel(config)
@@ -85,4 +92,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(data_prefix = sys.argv[1])

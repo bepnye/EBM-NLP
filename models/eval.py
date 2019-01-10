@@ -108,6 +108,10 @@ def eval_labels(ebm_nlp_dir, pred_labels, phase, pio, eval_func = vanilla_tokens
 
 def token_f1(true, pred, labels):
 
+  print(true[:30])
+  print(pred[:30])
+  print(labels)
+
   prec = precision_score(true, pred, labels = labels, average='micro')
   rec = recall_score(true, pred, labels = labels, average='micro')
   f1=2*prec*rec/(prec+rec)

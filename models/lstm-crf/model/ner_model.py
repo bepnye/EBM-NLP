@@ -313,8 +313,6 @@ class NERModel(BaseModel):
             metrics: (dict) metrics["acc"] = 98.4, ...
 
         """
-        tags = list(self.idx_to_tag.values())
-        stats = { tag: { 'n_correct': 0., 'n_pred': 0., 'n_true': 0. } for tag in tags }
 
         def div_or_zero(num, den):
           return num/den if den else 0.0
@@ -337,6 +335,7 @@ class NERModel(BaseModel):
                 l_pred += lab_pred
 
         # Token stats
+        tags = list(self.idx_to_tag.keys())
         return eval.token_f1(true = l_true, pred = l_pred, labels = tags)
 
 
