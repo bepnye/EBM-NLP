@@ -3,7 +3,7 @@ from glob import glob
 from itertools import groupby, combinations
 from sklearn.metrics import cohen_kappa_score, precision_score, recall_score, precision_recall_fscore_support
 
-DATA_DIR = 'ebm_nlp_1_00/'
+DATA_DIR = 'ebm_nlp_2_00/'
 PHASES = ('starting_spans', 'hierarchical_labels')
 ELEMENTS = ('participants', 'interventions', 'outcomes')
 
@@ -79,8 +79,8 @@ def read_anns(phase, element, ann_type = 'aggregated', model_phase = 'train'):
   print('Found %d files in %s' %(len(fnames), fdir))
 
   for fname in fnames:
-    labels = [int(i) for i in open(fname).read().strip().split(',')]
-    pmid, wid = os.path.basename(fname).split('.')[0].split('_')
+    labels = [int(i) for i in open(fname).read().strip().split('\n')]
+    pmid, wid = os.path.basename(fname).split('.')[0:2]
     if pmid not in docs:
       docs[pmid] = Doc(pmid, phase, element)
     if wid not in workers:
