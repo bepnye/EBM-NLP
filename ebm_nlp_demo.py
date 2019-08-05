@@ -3,7 +3,7 @@ from glob import glob
 from itertools import groupby, combinations
 from sklearn.metrics import cohen_kappa_score, precision_score, recall_score, precision_recall_fscore_support
 
-DATA_DIR = 'ebm_nlp_1_00/'
+DATA_DIR = 'ebm_nlp_2_00/'
 PHASES = ('starting_spans', 'hierarchical_labels')
 ELEMENTS = ('participants', 'interventions', 'outcomes')
 
@@ -55,7 +55,7 @@ class Doc:
     with open(os.path.join(DATA_DIR, 'documents', '%s.txt' %pmid)) as fp:
       self.text = fp.read()
     with open(os.path.join(DATA_DIR, 'documents', '%s.tokens' %pmid)) as fp:
-      self.tokens = fp.read().split(' ')
+      self.tokens = fp.read().split('\n')
     self.pmid = pmid
     self.decoder = LABEL_DECODERS[phase][element]
     self.anns = {}
@@ -79,8 +79,8 @@ def read_anns(phase, element, ann_type = 'aggregated', model_phase = 'train'):
   print('Found %d files in %s' %(len(fnames), fdir))
 
   for fname in fnames:
-    labels = [int(i) for i in open(fname).read().strip().split(',')]
-    pmid, wid = os.path.basename(fname).split('.')[0].split('_')
+    labels = [int(i) for i in open(fname).read().strip().split('\n')]
+    pmid, wid, f_ext = os.path.basename(fname).split('.')
     if pmid not in docs:
       docs[pmid] = Doc(pmid, phase, element)
     if wid not in workers:
